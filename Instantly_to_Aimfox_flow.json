@@ -1,0 +1,1517 @@
+{
+  "name": "Instantly to Aimfox flow",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "campaign",
+        "operation": "addProfileToCampaign",
+        "campaignId": "<REDACTED_CAMPAIGN_ID>",
+        "profileUrl": "={{ $json.body.linkedIn }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-aimfox.aimfox",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "36cc1f56-0687-4ab4-aac7-c54f1374dcf4",
+      "name": "Add profile to campaign",
+      "credentials": {
+        "aimfoxApi": {
+          "id": "<REDACTED_CREDENTIAL_ID>", "name": "<REDACTED_CREDENTIAL_NAME>"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.breakcold.com/rest/status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "<BREAKCOLD_API_KEY>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        192
+      ],
+      "id": "a561f759-856f-4013-bc34-1082cf1e3f15",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.breakcold.com/rest/lead",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "<BREAKCOLD_API_KEY>"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"linkedin_url\": \"{{ $json.body.linkedIn }}\",\n  \"email\": \"{{ $json.body.email }}\",\n  \"is_company\": false,\n  \"is_contract\": false,\n  \"create_company_if_not_exists\": true,\n  \"auto_assign_owner\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -48,
+        208
+      ],
+      "id": "0ea0905a-732b-4064-9429-b0c49249b78b",
+      "name": "Breakcold connection"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "33057672-0536-48f2-8aa0-b1ac0bb4fc1c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        -16
+      ],
+      "id": "22a1d930-edb0-4e35-9a04-eea775c47701",
+      "name": "email_open_test",
+      "webhookId": "<REDACTED_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "instantly-to-aimfox",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "c72df5ed-ef5f-45eb-a6b5-85ddc106db71",
+      "name": "email_open",
+      "webhookId": "<REDACTED_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e0b709cb-b906-4cbb-809f-9ea4f1fff098",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        208
+      ],
+      "id": "fa878f26-f0e6-4c1e-9df4-2ba4c69d7c57",
+      "name": "reply_recieved",
+      "webhookId": "<REDACTED_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "aimfox-to-breakcold",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -640,
+        624
+      ],
+      "id": "8f681690-987a-4dc3-9122-35cd9cf1bcbb",
+      "name": "aimfox - replied",
+      "webhookId": "<REDACTED_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "events": [
+          "reply",
+          "inmail_reply"
+        ]
+      },
+      "type": "n8n-nodes-aimfox.aimfoxTrigger",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        208
+      ],
+      "id": "fc66958f-fa6f-407f-b290-8a2f020e9be5",
+      "name": "Aimfox Trigger",
+      "webhookId": "<REDACTED_WEBHOOK_ID>",
+      "credentials": {
+        "aimfoxApi": {
+          "id": "<REDACTED_CREDENTIAL_ID>", "name": "<REDACTED_CREDENTIAL_NAME>"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.breakcold.com/rest/lead",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "<BREAKCOLD_API_KEY>"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"linkedin_url\": \"{{ $json.linkedin_url }}\",\n  \"email\": \"{{ $json['sender email'] }}\",\n  \"first_name\": \"{{ $json['First Name'] }}\",\n  \"last_name\": \"{{ $json['Last Name'] }}\",\n  \"status\": [\n    \"a9ead3cb-6ae5-4f9c-a9c0-f3cd557d3915\"\n  ],\n  \"is_company\": false,\n  \"is_contract\": false,\n  \"create_company_if_not_exists\": true,\n  \"auto_assign_owner\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -784,
+        112
+      ],
+      "id": "d42ec77e-22bf-47a2-ad63-bbf8f4f929a4",
+      "name": "Breakcold connection1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst output = items.map(item => {\n \n  const data = item.json; \n  const linkedinUrl = data.sender_identifier \n    ? `https://www.linkedin.com/in/${data.sender_identifier}`\n    : null;\n\n  return {\n    json: {\n      ...data,\n      linkedin_url: linkedinUrl\n    }\n  };\n});\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        112
+      ],
+      "id": "5b9685d8-d0e2-4f7d-9230-e64764c49e6f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0358230-b7f1-408d-964b-1402eec0c344",
+              "name": "event_type",
+              "value": "={{ $json.body.event_type }}",
+              "type": "string"
+            },
+            {
+              "id": "3737404f-c602-4d83-ad98-389cd4e53d71",
+              "name": "campaign name",
+              "value": "={{ $json.body.event.campaign.name }}",
+              "type": "string"
+            },
+            {
+              "id": "23cac655-5f48-4459-b7cb-877d486cecc3",
+              "name": "sender_identifier",
+              "value": "={{ $json.body.event.sender.public_identifier }}",
+              "type": "string"
+            },
+            {
+              "id": "c5ad792a-35eb-4c2a-acf4-46fd2d5b8544",
+              "name": "First Name",
+              "value": "={{ $json.body.event.sender.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "56148d79-5373-4e6e-809e-9163dff0b78b",
+              "name": "Last Name",
+              "value": "={{ $json.body.event.sender.last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "fc569682-78a4-44a2-bb71-773206d614f6",
+              "name": "message sent",
+              "value": "={{ $json.body.event.body }}",
+              "type": "string"
+            },
+            {
+              "id": "accd1fd6-6fc5-4ff0-9b05-11a284fe2775",
+              "name": "sender email",
+              "value": "={{ $json.body.event.sender.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1168,
+        112
+      ],
+      "id": "a96dcdd5-238c-478a-b952-f21d69d30f9a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "56922b35-82e6-4cdb-9376-fb41ffd8c24e",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1360,
+        112
+      ],
+      "id": "b37a76a7-5cef-479e-9d0f-aa5e028daf5b",
+      "name": "Webhook",
+      "webhookId": "<REDACTED_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.breakcold.com/rest/lead",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": "<BREAKCOLD_API_KEY>"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"linkedin_url\": \"{{ $json.linkedin_url }}\",\n  \"email\": \"{{ $json['sender email'] }}\",\n  \"first_name\": \"{{ $json['First Name'] }}\",\n  \"last_name\": \"{{ $json['Last Name'] }}\",\n  \"status\": [\n    \"a9ead3cb-6ae5-4f9c-a9c0-f3cd557d3915\"\n  ],\n  \"is_company\": false,\n  \"is_contract\": false,\n  \"create_company_if_not_exists\": true,\n  \"auto_assign_owner\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        64,
+        624
+      ],
+      "id": "884fc00d-8e77-479b-ac7b-815e0637e95d",
+      "name": "Breakcold connection2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst output = items.map(item => {\n \n  const data = item.json; \n  const linkedinUrl = data.sender_identifier \n    ? `https://www.linkedin.com/in/${data.sender_identifier}`\n    : null;\n\n  return {\n    json: {\n      ...data,\n      linkedin_url: linkedinUrl\n    }\n  };\n});\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        624
+      ],
+      "id": "abfbe36f-6880-4220-901e-0dd3b7637732",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0358230-b7f1-408d-964b-1402eec0c344",
+              "name": "event_type",
+              "value": "={{ $json.body.event_type }}",
+              "type": "string"
+            },
+            {
+              "id": "3737404f-c602-4d83-ad98-389cd4e53d71",
+              "name": "campaign name",
+              "value": "={{ $json.body.event.campaign.name }}",
+              "type": "string"
+            },
+            {
+              "id": "23cac655-5f48-4459-b7cb-877d486cecc3",
+              "name": "sender_identifier",
+              "value": "={{ $json.body.event.sender.public_identifier }}",
+              "type": "string"
+            },
+            {
+              "id": "c5ad792a-35eb-4c2a-acf4-46fd2d5b8544",
+              "name": "First Name",
+              "value": "={{ $json.body.event.sender.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "56148d79-5373-4e6e-809e-9163dff0b78b",
+              "name": "Last Name",
+              "value": "={{ $json.body.event.sender.last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "fc569682-78a4-44a2-bb71-773206d614f6",
+              "name": "message sent",
+              "value": "={{ $json.body.event.body }}",
+              "type": "string"
+            },
+            {
+              "id": "accd1fd6-6fc5-4ff0-9b05-11a284fe2775",
+              "name": "sender email",
+              "value": "={{ $json.body.event.sender.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        624
+      ],
+      "id": "9b3b9dd5-c1ac-4bff-95dd-09fdfd2600fc",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "56922b35-82e6-4cdb-9376-fb41ffd8c24e",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        288,
+        0
+      ],
+      "id": "8bd441f0-8794-4358-b4d8-11de9dee697b",
+      "name": "Webhook1",
+      "webhookId": "<REDACTED_WEBHOOK_ID>"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the webhook data from n8n input\nconst inputData = $input.all()[0].json;\n\nconsole.log('Full Input:', JSON.stringify(inputData, null, 2));\n\n// Handle different possible structures\nlet webhookData;\n\n// Check if it's already the webhook object or wrapped in an array\nif (Array.isArray(inputData)) {\n  webhookData = inputData[0];\n} else if (inputData.body) {\n  webhookData = inputData;\n} else {\n  // Maybe the previous node already extracted body\n  webhookData = { body: inputData };\n}\n\nconsole.log('Webhook Data:', JSON.stringify(webhookData, null, 2));\n\n// Check if we have the event data\nif (!webhookData.body || !webhookData.body.event) {\n  throw new Error('Cannot find event data in webhook. Structure: ' + JSON.stringify(Object.keys(webhookData)));\n}\n\n// Extract the event data\nconst event = webhookData.body.event;\nconst target = event.target;\nconst account = event.account;\nconst campaign = event.campaign;\nconst workspace = webhookData.body.workspace;\n\n// Normalize the data\nconst normalizedData = {\n  // Basic contact info\n  first_name: target.first_name.trim(),\n  last_name: target.last_name.trim(),\n  email: target.email,\n  \n  // LinkedIn info\n  linkedin_url: `https://www.linkedin.com/in/${target.public_identifier}`,\n  linkedin_id: target.id,\n  linkedin_urn: target.urn,\n  \n  // Message details\n  message: event.message,\n  reply_timestamp: event.timestamp,\n  \n  // Campaign info\n  campaign_id: campaign.id,\n  campaign_name: campaign.name,\n  campaign_type: campaign.type,\n  \n  // Flow info\n  flow_id: event.flow_id,\n  flow_type: event.flow_type,\n  \n  // Event metadata\n  event_type: webhookData.body.event_type,\n  event_id: webhookData.body.id,\n  previous_state: event.prev_state,\n  current_state: event.state,\n  \n  // Account (sender) info\n  sender_first_name: account.first_name.trim(),\n  sender_last_name: account.last_name.trim(),\n  sender_email: account.email,\n  sender_linkedin_url: `https://www.linkedin.com/in/${account.public_identifier}`,\n  \n  // Workspace info\n  workspace_id: workspace.id,\n  workspace_name: workspace.name,\n  \n  // Profile pictures\n  profile_picture: target.picture_url,\n  sender_picture: account.picture_url\n};\n\nreturn { json: normalizedData };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        0
+      ],
+      "id": "4844f237-ace5-49a3-a552-661eec43cbd4",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ffd3165-91c1-45bb-aaf8-ecb322b55cb1",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "array"
+            },
+            {
+              "id": "10dbdeb5-d135-421a-9f63-4858a3fcd891",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        0
+      ],
+      "id": "b84f9e50-b235-4638-81c6-76267ee240b5",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9e743a7a-33a8-413b-b632-e42214696db4",
+              "name": "body[0].headers",
+              "value": "={{ $json.body[0].headers }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        0
+      ],
+      "id": "7ceafecc-0849-405e-a791-7abffe03cdd3",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "content": "## Main Flow",
+        "height": 336,
+        "width": 1456
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -912,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "ed8a1678-86d0-43b3-a851-ce450520aff5",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Breakcold connection": {
+      "main": [
+        []
+      ]
+    },
+    "email_open_test": {
+      "main": [
+        []
+      ]
+    },
+    "email_open": {
+      "main": [
+        [
+          {
+            "node": "Add profile to campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aimfox Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "reply_recieved": {
+      "main": [
+        [
+          {
+            "node": "Breakcold connection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "aimfox - replied": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Breakcold connection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Breakcold connection2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Aimfox Trigger": {}
+  },
+  "pinData": {
+    "email_open_test": [
+      {
+        "json": {
+          "headers": {
+            "host": "<REDACTED_N8N_HOST>",
+            "user-agent": "axios/0.21.4",
+            "content-length": "423",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "<REDACTED_IP>",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "<REDACTED>",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "<REDACTED_IP>, <REDACTED_IP>",
+            "x-forwarded-host": "<REDACTED_N8N_HOST>",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "<REDACTED>",
+            "x-is-trusted": "yes",
+            "x-real-ip": "<REDACTED_IP>"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "timestamp": "2025-12-30T11:15:17.568Z",
+            "event_type": "email_opened",
+            "workspace": "16f1b2ae-21b3-413c-9c78-f69ba93f088d",
+            "campaign_id": "34f093c9-51d9-4a8b-84bc-feac41c6cbee",
+            "unibox_url": null,
+            "campaign_name": "Test (copy) 1",
+            "email_account": "<REDACTED_EMAIL>",
+            "lead_email": "<REDACTED_EMAIL>",
+            "email": "<REDACTED_EMAIL>",
+            "linkedIn": "<REDACTED_LINKEDIN_URL>/",
+            "step": 1,
+            "variant": 1
+          },
+          "webhookUrl": "https://<REDACTED_N8N_HOST>/webhook-test/33057672-0536-48f2-8aa0-b1ac0bb4fc1c",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "email_open": [
+      {
+        "json": {
+          "headers": {
+            "host": "<REDACTED_N8N_HOST>",
+            "user-agent": "axios/1.12.0",
+            "content-length": "421",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "<REDACTED_IP>",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "<REDACTED>",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "<REDACTED_IP>, <REDACTED_IP>",
+            "x-forwarded-host": "<REDACTED_N8N_HOST>",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "<REDACTED>",
+            "x-is-trusted": "yes",
+            "x-real-ip": "<REDACTED_IP>"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "step": 1,
+            "email": "<REDACTED_EMAIL>",
+            "variant": 1,
+            "linkedIn": "<REDACTED_LINKEDIN_URL>/",
+            "timestamp": "2025-12-30T10:00:46.063Z",
+            "workspace": "16f1b2ae-21b3-413c-9c78-f69ba93f088d",
+            "event_type": "email_opened",
+            "lead_email": "<REDACTED_EMAIL>",
+            "unibox_url": null,
+            "campaign_id": "0e945237-3b0b-4bc7-b764-11be23fcce70",
+            "campaign_name": "Test (copy)",
+            "email_account": "<REDACTED_EMAIL>"
+          },
+          "webhookUrl": "https://<REDACTED_N8N_HOST>/webhook-test/adc9e90c-3523-420b-862a-c43c52d0ce19",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "aimfox - replied": [
+      {
+        "json": {
+          "headers": {
+            "host": "<REDACTED_N8N_HOST>",
+            "user-agent": "got (https://github.com/sindresorhus/got)",
+            "content-length": "3288",
+            "accept-encoding": "gzip, br",
+            "baggage": "sentry-environment=production,sentry-public_key=d2127ed46413114966b7f581cccbf5df,sentry-trace_id=885dcc63c5e9924250eb723ad4000e82,sentry-sample_rate=1,sentry-transaction=POST%20%2Fapi%2Fv1%2Fworkspaces%2F30af53e0-719c-4e01-ba9f-c98db9ede2ee%2Fwebhooks%2F3a7461c0-836f-47ee-9262-40107bba936e%2Fevents%2Fcampaign_reply%2Ftest,sentry-sampled=true",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "<REDACTED_IP>",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "RS",
+            "cf-ray": "<REDACTED>",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "sentry-trace": "885dcc63c5e9924250eb723ad4000e82-61e75bab866c5739-1",
+            "x-forwarded-for": "<REDACTED_IP>, <REDACTED_IP>",
+            "x-forwarded-host": "<REDACTED_N8N_HOST>",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "<REDACTED>",
+            "x-is-trusted": "yes",
+            "x-real-ip": "<REDACTED_IP>"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": "1e5e930e-c44c-4994-9b85-a6b65423f3e8",
+            "event_type": "campaign_reply",
+            "event": {
+              "conversation_urn": "2-MTBmOGZlNGUtNzZjZS00MjZkLWE0NTAtNGY2NjIyOTNlM2RiXzEwMA==",
+              "message_urn": "2-MTc2MTY1OTA0ODIwNGI0NTg0Ny0xMDAmMTBmOGZlNGUtNzZjZS00MjZkLWE0NTAtNGY2NjIyOTNlM2RiXzEwMA==",
+              "body": "Hey, can you try once? It will take a maximum of 2-3 minutes and the first 5 prompts are free.",
+              "declined": false,
+              "message": {
+                "urn": "2-MTc2MTY1OTA0ODIwNGI0NTg0Ny0xMDAmMTBmOGZlNGUtNzZjZS00MjZkLWE0NTAtNGY2NjIyOTNlM2RiXzEwMA==",
+                "inmail": false,
+                "subject": null,
+                "body": "Hey, can you try once? It will take a maximum of 2-3 minutes and the first 5 prompts are free.",
+                "reactions": [],
+                "sender": "1432144979",
+                "created_at": 1761659048204,
+                "edited": false,
+                "deleted": false
+              },
+              "timestamp": "2025-10-28T13:44:08.204Z",
+              "sender": {
+                "id": 1432144979,
+                "urn": "ACoAAFVczFMB65mrY-IofOnkRLexvBVXhT5HcQs",
+                "public_identifier": "john-doe-72b75733b",
+                "first_name": "John ",
+                "last_name": "Doe",
+                "email": "<REDACTED_EMAIL>",
+                "picture_url": "https://cdn.constel.co/linkedin-profile/ACoAAFVczFMB65mrY-IofOnkRLexvBVXhT5HcQs.jpg"
+              },
+              "recipient": {
+                "id": 1033744867,
+                "urn": "ACoAAD2dseMBdvw12MyzFvftslnla0_OX5XeBgQ",
+                "public_identifier": "jane-doe-b9724724a",
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "email": "<REDACTED_EMAIL>",
+                "picture_url": "https://cdn.constel.co/linkedin-profile/ACoAAD2dseMBdvw12MyzFvftslnla0_OX5XeBgQ.jpg"
+              },
+              "campaign": {
+                "id": "3acad0ac-e95d-4d2a-84ec-896a3562e29d",
+                "state": "ACTIVE",
+                "schedule": [
+                  {
+                    "timezone": {
+                      "name": null,
+                      "offset": null
+                    },
+                    "sunday": {
+                      "intervals": [
+                        {
+                          "start": 9,
+                          "end": 17
+                        }
+                      ]
+                    },
+                    "monday": {
+                      "intervals": [
+                        {
+                          "start": 9,
+                          "end": 17
+                        }
+                      ]
+                    },
+                    "tuesday": {
+                      "intervals": [
+                        {
+                          "start": 9,
+                          "end": 17
+                        }
+                      ]
+                    },
+                    "wednesday": {
+                      "intervals": [
+                        {
+                          "start": 9,
+                          "end": 17
+                        }
+                      ]
+                    },
+                    "thursday": {
+                      "intervals": [
+                        {
+                          "start": 9,
+                          "end": 17
+                        }
+                      ]
+                    },
+                    "friday": {
+                      "intervals": [
+                        {
+                          "start": 9,
+                          "end": 17
+                        }
+                      ]
+                    },
+                    "saturday": {
+                      "intervals": [
+                        {
+                          "start": 9,
+                          "end": 17
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "name": "LinkedIn search Campaign #25",
+                "type": "search",
+                "outreach_type": "connect",
+                "inmail_optimization": false,
+                "audience_size": 3,
+                "target_count": 3,
+                "created_at": 1762356684341,
+                "completion": 0,
+                "owners": [
+                  "1033744867"
+                ],
+                "miner": "1033744867",
+                "custom_variable_keys": [],
+                "autolabel_ids": null,
+                "start_date": null,
+                "labels": [],
+                "uses_connection_note": false,
+                "flows": [
+                  {
+                    "id": "5ab88309-3b04-4e54-9661-024ed762fe79",
+                    "translate": false,
+                    "source_language": null,
+                    "is_manual_language": false,
+                    "type": "PRIMARY_CONNECT",
+                    "name": "Connection Flow A",
+                    "template": null,
+                    "flow_message_templates": [],
+                    "withdraw_delay": 604800000,
+                    "endorse_enabled": false,
+                    "endorse_delay": null,
+                    "like_enabled": false,
+                    "like_delay": null,
+                    "like_type": "LIKE",
+                    "metrics": {}
+                  },
+                  {
+                    "id": "ff242328-38ba-4637-8735-6d4ff0bf234b",
+                    "translate": false,
+                    "source_language": null,
+                    "is_manual_language": false,
+                    "type": "INMAIL_OPTIMIZATION",
+                    "name": "",
+                    "template": null,
+                    "flow_message_templates": [],
+                    "withdraw_delay": 604800000,
+                    "endorse_enabled": false,
+                    "endorse_delay": null,
+                    "like_enabled": false,
+                    "like_delay": null,
+                    "like_type": "LIKE",
+                    "metrics": {}
+                  },
+                  {
+                    "id": "31b3de04-df58-49a7-b82d-f020262a9ab7",
+                    "translate": false,
+                    "source_language": null,
+                    "is_manual_language": false,
+                    "type": "CONNECT_OPTIMIZATION",
+                    "name": "",
+                    "template": null,
+                    "flow_message_templates": [],
+                    "withdraw_delay": 604800000,
+                    "endorse_enabled": false,
+                    "endorse_delay": null,
+                    "like_enabled": false,
+                    "like_delay": null,
+                    "like_type": "LIKE",
+                    "metrics": {}
+                  }
+                ]
+              }
+            },
+            "workspace": {
+              "id": "30af53e0-719c-4e01-ba9f-c98db9ede2ee",
+              "name": "Jane's workspace",
+              "created_at": 1725279327
+            }
+          },
+          "webhookUrl": "https://<REDACTED_N8N_HOST>/webhook-test/aimfox-to-breakcold",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "HTTP Request1": [
+      {
+        "json": {
+          "type": null,
+          "id": "17d53235-936a-440c-bb9c-0ab599601515",
+          "name": "Neutral",
+          "order": 0,
+          "color": "#79BBFF",
+          "success_rate": 0,
+          "created_at": "2025-12-15T12:52:44.424Z",
+          "updated_at": null,
+          "id_space": "9b67e2cc-226c-4f71-a0fa-218e9099f0db",
+          "ai_instructions": null,
+          "ai_rules": null,
+          "ai_instructions_text": null,
+          "ai_rules_text": null,
+          "ai_enabled": true,
+          "instructions": null,
+          "id_list": null,
+          "list": null
+        }
+      },
+      {
+        "json": {
+          "type": null,
+          "id": "2c796646-c0b7-48d4-8993-2dc9402abc3f",
+          "name": "Interested",
+          "order": 0,
+          "color": "#84cc16",
+          "success_rate": 0,
+          "created_at": "2026-01-05T06:03:57.047Z",
+          "updated_at": "2026-01-05T06:05:28.297Z",
+          "id_space": "9b67e2cc-226c-4f71-a0fa-218e9099f0db",
+          "ai_instructions": null,
+          "ai_rules": null,
+          "ai_instructions_text": null,
+          "ai_rules_text": null,
+          "ai_enabled": true,
+          "instructions": null,
+          "id_list": null,
+          "list": null
+        }
+      },
+      {
+        "json": {
+          "type": null,
+          "id": "a9ead3cb-6ae5-4f9c-a9c0-f3cd557d3915",
+          "name": "New Lead",
+          "order": 0,
+          "color": "#909399",
+          "success_rate": 0,
+          "created_at": "2026-01-05T13:30:56.244Z",
+          "updated_at": null,
+          "id_space": "9b67e2cc-226c-4f71-a0fa-218e9099f0db",
+          "ai_instructions": null,
+          "ai_rules": null,
+          "ai_instructions_text": null,
+          "ai_rules_text": null,
+          "ai_enabled": true,
+          "instructions": null,
+          "id_list": null,
+          "list": null
+        }
+      },
+      {
+        "json": {
+          "type": null,
+          "id": "ab47881b-a367-42ba-a247-85e5388c19eb",
+          "name": "Future Prospect",
+          "order": 0,
+          "color": "#6366f1",
+          "success_rate": 0,
+          "created_at": "2025-12-15T12:56:56.276Z",
+          "updated_at": "2026-01-05T06:05:29.434Z",
+          "id_space": "9b67e2cc-226c-4f71-a0fa-218e9099f0db",
+          "ai_instructions": null,
+          "ai_rules": null,
+          "ai_instructions_text": null,
+          "ai_rules_text": null,
+          "ai_enabled": true,
+          "instructions": null,
+          "id_list": null,
+          "list": null
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "<REDACTED_N8N_HOST>",
+            "user-agent": "axios/1.12.0",
+            "content-length": "5371",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "<REDACTED_IP>",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "<REDACTED>",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "<REDACTED_IP>, <REDACTED_IP>",
+            "x-forwarded-host": "<REDACTED_N8N_HOST>",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "<REDACTED>",
+            "x-is-trusted": "yes",
+            "x-real-ip": "<REDACTED_IP>"
+          },
+          "params": {},
+          "query": {},
+          "body": [
+            {
+              "headers": {
+                "host": "<REDACTED_N8N_HOST>",
+                "user-agent": "got (https://github.com/sindresorhus/got)",
+                "content-length": "4352",
+                "accept-encoding": "gzip, br",
+                "baggage": "sentry-environment=production,sentry-public_key=d2127ed46413114966b7f581cccbf5df,sentry-trace_id=69e0e03518b1676fd06f3d4261c31b52,sentry-sampled=false",
+                "cdn-loop": "cloudflare; loops=1; subreqs=1",
+                "cf-connecting-ip": "<REDACTED_IP>",
+                "cf-ew-via": "15",
+                "cf-ipcountry": "RS",
+                "cf-ray": "<REDACTED>",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "cf-worker": "n8n.cloud",
+                "content-type": "application/json",
+                "sentry-trace": "69e0e03518b1676fd06f3d4261c31b52-b5fd1a0bc6ee8d7c",
+                "x-forwarded-for": "<REDACTED_IP>, <REDACTED_IP>",
+                "x-forwarded-host": "<REDACTED_N8N_HOST>",
+                "x-forwarded-port": "443",
+                "x-forwarded-proto": "https",
+                "x-forwarded-server": "<REDACTED>",
+                "x-is-trusted": "yes",
+                "x-real-ip": "<REDACTED_IP>"
+              },
+              "params": {},
+              "query": {},
+              "body": {
+                "id": "1ab194b1-7e06-4ea6-813d-0566223f7fce",
+                "event_type": "reply",
+                "event": {
+                  "target_urn": "ACoAAB-7Cn0B0Oev_QYfxUOKNMBNExJcv2azczA",
+                  "prev_state": "message",
+                  "state": "done",
+                  "transition": "reply",
+                  "flow_id": "9fae3391-b47f-426a-883b-9c4d38917c0f",
+                  "flow_type": "PRIMARY_CONNECT",
+                  "template_id": "7de8acae-3e9a-420b-890e-a4787e85cc57",
+                  "metadata": {
+                    "declined": false
+                  },
+                  "message": "Hey Ian, you need to normalize first names before sending. Makes you look bad 😅\n\nGood luck on future endeavors! ",
+                  "timestamp": "2026-01-06T00:32:46.294Z",
+                  "target": {
+                    "id": 532351613,
+                    "urn": "ACoAAB-7Cn0B0Oev_QYfxUOKNMBNExJcv2azczA",
+                    "public_identifier": "jorge-b-macias",
+                    "first_name": "Jorge B.",
+                    "last_name": "Macías 🇵🇷",
+                    "email": "<REDACTED_EMAIL>",
+                    "picture_url": "https://cdn.constel.co/linkedin-profile/ACoAAB-7Cn0B0Oev_QYfxUOKNMBNExJcv2azczA.jpg"
+                  },
+                  "account": {
+                    "id": 787866557,
+                    "urn": "ACoAAC71470BAJV60_3C9yEz6hyK4zQxFmQLT9M",
+                    "public_identifier": "ian-jason-creado-365a3119b",
+                    "first_name": "Ian Jason ",
+                    "last_name": "Creado",
+                    "email": "<REDACTED_EMAIL>",
+                    "picture_url": "https://cdn.constel.co/linkedin-profile/787866557.jpg"
+                  },
+                  "campaign": {
+                    "id": "8212045e-4520-4575-ab3a-887e7472a6e9",
+                    "state": "ACTIVE",
+                    "schedule": {
+                      "timezone": {
+                        "name": "(UTC-07:00) Mountain Time (US & Canada)",
+                        "offset": -6
+                      },
+                      "monday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "tuesday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "wednesday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "thursday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "friday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "saturday": {
+                        "intervals": []
+                      },
+                      "sunday": {
+                        "intervals": []
+                      }
+                    },
+                    "name": "Clay Partner Campaign 2",
+                    "type": "list",
+                    "outreach_type": "connect",
+                    "inmail_optimization": false,
+                    "audience_size": 10000,
+                    "target_count": 132,
+                    "created_at": 1766742920848,
+                    "completion": 0.5037878787878788,
+                    "owners": [
+                      "787866557"
+                    ],
+                    "custom_variable_keys": [],
+                    "autolabel_ids": null,
+                    "start_date": null,
+                    "labels": [],
+                    "crm_type": null,
+                    "uses_connection_note": false,
+                    "flows": [
+                      {
+                        "id": "6b5266b5-2592-4cd2-b013-6b488162d42a",
+                        "translate": false,
+                        "source_language": null,
+                        "is_manual_language": false,
+                        "type": "INMAIL_OPTIMIZATION",
+                        "name": "",
+                        "template": null,
+                        "flow_message_templates": [],
+                        "withdraw_delay": 604800000,
+                        "endorse_enabled": false,
+                        "endorse_delay": null,
+                        "like_enabled": false,
+                        "like_delay": null,
+                        "like_type": "LIKE"
+                      },
+                      {
+                        "id": "3aece662-9d9b-401b-8131-74e5216d1a31",
+                        "translate": false,
+                        "source_language": null,
+                        "is_manual_language": false,
+                        "type": "CONNECT_OPTIMIZATION",
+                        "name": "",
+                        "template": null,
+                        "flow_message_templates": [],
+                        "withdraw_delay": 604800000,
+                        "endorse_enabled": false,
+                        "endorse_delay": null,
+                        "like_enabled": false,
+                        "like_delay": null,
+                        "like_type": "LIKE"
+                      },
+                      {
+                        "id": "9fae3391-b47f-426a-883b-9c4d38917c0f",
+                        "translate": false,
+                        "source_language": "en",
+                        "is_manual_language": false,
+                        "type": "PRIMARY_CONNECT",
+                        "name": "Connection Flow A",
+                        "template": null,
+                        "flow_message_templates": [
+                          {
+                            "type": "MESSAGE_TEMPLATE",
+                            "message": "Hey ,\n\nThanks for connecting.\n\nQuick question (not a pitch): I run HubCredo, and we build workflow automations using tools like Clay, N8n, etc. \n\nI wanted to reach out to understand whether successful agencies like yours ever consider outsourcing parts of execution so they can focus more on scaling than day-to-day operations.\n\nWould you be open to a short 15-min chat to share how you think about this? Promise to keep it strictly conversational.\n\nThanks,\nIan",
+                            "edited": false,
+                            "original_id": "7de8acae-3e9a-420b-890e-a4787e85cc57",
+                            "delay": 240,
+                            "ai_descriptors": {},
+                            "attachments": []
+                          },
+                          {
+                            "type": "MESSAGE_TEMPLATE",
+                            "message": "Hi ,\n\nJust following up in case my earlier message was missed.\n\nTo be honest, getting fairly priced projects can be challenging.   \n\nOur strength, however, is execution; we have a strong operations setup and a capable team of GTM engineers.\n\nI wanted to understand whether agencies like yours ever consider outsourcing execution through a white-label model, so you can focus more on scaling.\n\nI’m just gathering feedback at this stage on what works and what doesn’t.\n\nBest,\nIan.",
+                            "edited": false,
+                            "original_id": "98fd24e5-18b2-4982-b9ff-a42b22a9b957",
+                            "delay": 72,
+                            "ai_descriptors": {},
+                            "attachments": []
+                          }
+                        ],
+                        "withdraw_delay": 1209600000,
+                        "endorse_enabled": false,
+                        "endorse_delay": null,
+                        "like_enabled": true,
+                        "like_delay": 86400000,
+                        "like_type": "LIKE"
+                      }
+                    ]
+                  }
+                },
+                "workspace": {
+                  "id": "30af53e0-719c-4e01-ba9f-c98db9ede2ee",
+                  "name": "Hubcredo",
+                  "created_at": 1754287932
+                },
+                "timestamp": "2026-01-06T00:32:46.294Z"
+              },
+              "webhookUrl": "https://<REDACTED_N8N_HOST>/webhook/aimfox-to-breakcold",
+              "executionMode": "production"
+            }
+          ],
+          "webhookUrl": "https://<REDACTED_N8N_HOST>/webhook-test/56922b35-82e6-4cdb-9376-fb41ffd8c24e",
+          "executionMode": "test"
+        }
+      }
+    ],
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "<REDACTED_N8N_HOST>",
+            "user-agent": "axios/1.12.0",
+            "content-length": "5371",
+            "accept": "application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, image/*;q=0.8, */*;q=0.7",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "<REDACTED_IP>",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "DE",
+            "cf-ray": "<REDACTED>",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "<REDACTED_IP>, <REDACTED_IP>",
+            "x-forwarded-host": "<REDACTED_N8N_HOST>",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "<REDACTED>",
+            "x-is-trusted": "yes",
+            "x-real-ip": "<REDACTED_IP>"
+          },
+          "params": {},
+          "query": {},
+          "body": [
+            {
+              "headers": {
+                "host": "<REDACTED_N8N_HOST>",
+                "user-agent": "got (https://github.com/sindresorhus/got)",
+                "content-length": "4352",
+                "accept-encoding": "gzip, br",
+                "baggage": "sentry-environment=production,sentry-public_key=d2127ed46413114966b7f581cccbf5df,sentry-trace_id=69e0e03518b1676fd06f3d4261c31b52,sentry-sampled=false",
+                "cdn-loop": "cloudflare; loops=1; subreqs=1",
+                "cf-connecting-ip": "<REDACTED_IP>",
+                "cf-ew-via": "15",
+                "cf-ipcountry": "RS",
+                "cf-ray": "<REDACTED>",
+                "cf-visitor": "{\"scheme\":\"https\"}",
+                "cf-worker": "n8n.cloud",
+                "content-type": "application/json",
+                "sentry-trace": "69e0e03518b1676fd06f3d4261c31b52-b5fd1a0bc6ee8d7c",
+                "x-forwarded-for": "<REDACTED_IP>, <REDACTED_IP>",
+                "x-forwarded-host": "<REDACTED_N8N_HOST>",
+                "x-forwarded-port": "443",
+                "x-forwarded-proto": "https",
+                "x-forwarded-server": "<REDACTED>",
+                "x-is-trusted": "yes",
+                "x-real-ip": "<REDACTED_IP>"
+              },
+              "params": {},
+              "query": {},
+              "body": {
+                "id": "1ab194b1-7e06-4ea6-813d-0566223f7fce",
+                "event_type": "reply",
+                "event": {
+                  "target_urn": "ACoAAB-7Cn0B0Oev_QYfxUOKNMBNExJcv2azczA",
+                  "prev_state": "message",
+                  "state": "done",
+                  "transition": "reply",
+                  "flow_id": "9fae3391-b47f-426a-883b-9c4d38917c0f",
+                  "flow_type": "PRIMARY_CONNECT",
+                  "template_id": "7de8acae-3e9a-420b-890e-a4787e85cc57",
+                  "metadata": {
+                    "declined": false
+                  },
+                  "message": "Hey Ian, you need to normalize first names before sending. Makes you look bad 😅\n\nGood luck on future endeavors! ",
+                  "timestamp": "2026-01-06T00:32:46.294Z",
+                  "target": {
+                    "id": 532351613,
+                    "urn": "ACoAAB-7Cn0B0Oev_QYfxUOKNMBNExJcv2azczA",
+                    "public_identifier": "jorge-b-macias",
+                    "first_name": "Jorge B.",
+                    "last_name": "Macías 🇵🇷",
+                    "email": "<REDACTED_EMAIL>",
+                    "picture_url": "https://cdn.constel.co/linkedin-profile/ACoAAB-7Cn0B0Oev_QYfxUOKNMBNExJcv2azczA.jpg"
+                  },
+                  "account": {
+                    "id": 787866557,
+                    "urn": "ACoAAC71470BAJV60_3C9yEz6hyK4zQxFmQLT9M",
+                    "public_identifier": "ian-jason-creado-365a3119b",
+                    "first_name": "Ian Jason ",
+                    "last_name": "Creado",
+                    "email": "<REDACTED_EMAIL>",
+                    "picture_url": "https://cdn.constel.co/linkedin-profile/787866557.jpg"
+                  },
+                  "campaign": {
+                    "id": "8212045e-4520-4575-ab3a-887e7472a6e9",
+                    "state": "ACTIVE",
+                    "schedule": {
+                      "timezone": {
+                        "name": "(UTC-07:00) Mountain Time (US & Canada)",
+                        "offset": -6
+                      },
+                      "monday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "tuesday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "wednesday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "thursday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "friday": {
+                        "intervals": [
+                          {
+                            "start": 9,
+                            "end": 17
+                          }
+                        ]
+                      },
+                      "saturday": {
+                        "intervals": []
+                      },
+                      "sunday": {
+                        "intervals": []
+                      }
+                    },
+                    "name": "Clay Partner Campaign 2",
+                    "type": "list",
+                    "outreach_type": "connect",
+                    "inmail_optimization": false,
+                    "audience_size": 10000,
+                    "target_count": 132,
+                    "created_at": 1766742920848,
+                    "completion": 0.5037878787878788,
+                    "owners": [
+                      "787866557"
+                    ],
+                    "custom_variable_keys": [],
+                    "autolabel_ids": null,
+                    "start_date": null,
+                    "labels": [],
+                    "crm_type": null,
+                    "uses_connection_note": false,
+                    "flows": [
+                      {
+                        "id": "6b5266b5-2592-4cd2-b013-6b488162d42a",
+                        "translate": false,
+                        "source_language": null,
+                        "is_manual_language": false,
+                        "type": "INMAIL_OPTIMIZATION",
+                        "name": "",
+                        "template": null,
+                        "flow_message_templates": [],
+                        "withdraw_delay": 604800000,
+                        "endorse_enabled": false,
+                        "endorse_delay": null,
+                        "like_enabled": false,
+                        "like_delay": null,
+                        "like_type": "LIKE"
+                      },
+                      {
+                        "id": "3aece662-9d9b-401b-8131-74e5216d1a31",
+                        "translate": false,
+                        "source_language": null,
+                        "is_manual_language": false,
+                        "type": "CONNECT_OPTIMIZATION",
+                        "name": "",
+                        "template": null,
+                        "flow_message_templates": [],
+                        "withdraw_delay": 604800000,
+                        "endorse_enabled": false,
+                        "endorse_delay": null,
+                        "like_enabled": false,
+                        "like_delay": null,
+                        "like_type": "LIKE"
+                      },
+                      {
+                        "id": "9fae3391-b47f-426a-883b-9c4d38917c0f",
+                        "translate": false,
+                        "source_language": "en",
+                        "is_manual_language": false,
+                        "type": "PRIMARY_CONNECT",
+                        "name": "Connection Flow A",
+                        "template": null,
+                        "flow_message_templates": [
+                          {
+                            "type": "MESSAGE_TEMPLATE",
+                            "message": "Hey ,\n\nThanks for connecting.\n\nQuick question (not a pitch): I run HubCredo, and we build workflow automations using tools like Clay, N8n, etc. \n\nI wanted to reach out to understand whether successful agencies like yours ever consider outsourcing parts of execution so they can focus more on scaling than day-to-day operations.\n\nWould you be open to a short 15-min chat to share how you think about this? Promise to keep it strictly conversational.\n\nThanks,\nIan",
+                            "edited": false,
+                            "original_id": "7de8acae-3e9a-420b-890e-a4787e85cc57",
+                            "delay": 240,
+                            "ai_descriptors": {},
+                            "attachments": []
+                          },
+                          {
+                            "type": "MESSAGE_TEMPLATE",
+                            "message": "Hi ,\n\nJust following up in case my earlier message was missed.\n\nTo be honest, getting fairly priced projects can be challenging.   \n\nOur strength, however, is execution; we have a strong operations setup and a capable team of GTM engineers.\n\nI wanted to understand whether agencies like yours ever consider outsourcing execution through a white-label model, so you can focus more on scaling.\n\nI’m just gathering feedback at this stage on what works and what doesn’t.\n\nBest,\nIan.",
+                            "edited": false,
+                            "original_id": "98fd24e5-18b2-4982-b9ff-a42b22a9b957",
+                            "delay": 72,
+                            "ai_descriptors": {},
+                            "attachments": []
+                          }
+                        ],
+                        "withdraw_delay": 1209600000,
+                        "endorse_enabled": false,
+                        "endorse_delay": null,
+                        "like_enabled": true,
+                        "like_delay": 86400000,
+                        "like_type": "LIKE"
+                      }
+                    ]
+                  }
+                },
+                "workspace": {
+                  "id": "30af53e0-719c-4e01-ba9f-c98db9ede2ee",
+                  "name": "Hubcredo",
+                  "created_at": 1754287932
+                },
+                "timestamp": "2026-01-06T00:32:46.294Z"
+              },
+              "webhookUrl": "https://<REDACTED_N8N_HOST>/webhook/aimfox-to-breakcold",
+              "executionMode": "production"
+            }
+          ],
+          "webhookUrl": "https://<REDACTED_N8N_HOST>/webhook-test/56922b35-82e6-4cdb-9376-fb41ffd8c24e",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "triggerCount": 6,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
